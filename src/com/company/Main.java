@@ -2,6 +2,7 @@ package com.company; //comment this out when submitting
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class Main {
@@ -23,6 +24,7 @@ public class Main {
             Scanner in2 = new Scanner(str); //scanner for scanning in parts of an expression
             while (in2.hasNext()) { //this is for iterating through a single expression
                 String s = in2.next();
+                //need to have a case for if the number is 00000
                 if (s.charAt(0) == '0') { //removes leading zeros
                     s = s.replace("0", "");
                 }
@@ -49,7 +51,7 @@ public class Main {
                     default -> stack.push(s); //when the current element in the string is a number
                 }
             }
-            //System.out.println(str + " = " + stack.pop());
+            System.out.println(str + " = " + stack.pop());
         }
     }
 
@@ -57,43 +59,39 @@ public class Main {
     public static String add(String str1, String str2) {
         //take in the numbers, turn them each into linked lists with the 1's place at the end of the list
         //then add the 1's, the 10's, etc and push the results back into the lists
-        LList list1 = new LList();
-        LList list2 = new LList();
+        LList list1 = makeList(str1);
+        LList list2 = makeList(str2);
         String result = "";
-        for (int i = str1.length() - 1; i > -1; i--) { //creates a reversed list of the 1st number
-            int num = Character.getNumericValue(str1.charAt(i));
-            list1.append(num);
-        }
-        for (int i = str2.length() - 1; i > -1; i--) { //creates a reversed list of the 2nd number
-            int num = Character.getNumericValue(str2.charAt(i));
-            list2.append(num);
-        }
-
         int carry = 0;
         for (int i = 0; i < list1.length(); i++) {
-            int num1;
-            int num2;
+            int num1 = getNum(list1);
+            int num2 = getNum(list2);
 
-            if (list1.isAtEnd()) {
+            //if the last num != 0, it'll give 0 anyways
+            //need to find a way to retrieve the last digit, then later evaluate if the list is at the end
+            /*if (list1.isAtEnd()) {
                 num1 = 0;
             }
             else {
                 num1 = (int)list1.getValue();
                 list1.next();
-            }
-            if (list2.isAtEnd()) {
+            }*/
+            //if the last num != 0, it'll give 0 anyways
+            //need to find a way to retrieve the last digit, then later evaluate if the list is at the end
+            /*if (list2.isAtEnd()) {
                 num2 = 0;
             }
             else {
                 num2 = (int)list2.getValue();
                 list2.next();
-            }
+            }*/
 
             int sum = num1 + num2 + carry;
             if (sum > 9) {
                 carry = sum / 10; //gets the first digit of the sum and turns it into a carry if > 9
             }
             else {
+                //might need to get checked later for possible issues
                 carry = 0; //resets the carry for the next iteration
             }
             result = result + (sum % 10);
@@ -101,6 +99,7 @@ public class Main {
                 result += carry;
             }
         }
+        //reverses number string so that it's in the correct order
         result = new StringBuilder(result).reverse().toString();
         return result;
     }
@@ -109,8 +108,8 @@ public class Main {
         //get the 1st value by multiplying the top digits first like in handwritten multiplication
         //then get the 2nd value by multiplying the lower digits and put a 0 before everything else
         //use .add() to add these digits together and return the result
-        LList list1 = new LList();
-        LList list2 = new LList();
+        LList list1 = makeList(str1);
+        LList list2 = makeList(str2);
         String result = "";
         for (int i = str1.length() - 1; i > 0; i--) {
             list1.append((int)str1.charAt(i));
@@ -147,5 +146,32 @@ public class Main {
         }
 
         return result;
+    }
+
+    public static LList makeList(String s) {
+        LList list = new LList();
+        for (int i = s.length() - 1; i > 0; i--) {
+            int num = Character.getNumericValue(s.charAt(i));
+            list.append(num);
+        }
+        return list;
+    }
+
+    public static int getNum(LList list) {
+        int num;
+        boolean end = false;
+        if (end) {
+            num = 0;
+        }
+        else {
+            num = (int)list.getValue();
+            if (list.isAtEnd()) {
+                end = true;
+            }
+            else {
+                list.next();
+            }
+        }
+        return num;
     }
 }
